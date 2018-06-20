@@ -54,7 +54,6 @@ def get_expiration_date(project_id):
         db = _dbconnect()
         c = db.cursor()
         query = "SELECT date_format(expiration_date, '%%M %%d, %%Y') from project_information where project_id = %s"
-        print query
         data = (project_id)
         c.execute(query, [data])
         date = c.fetchone()

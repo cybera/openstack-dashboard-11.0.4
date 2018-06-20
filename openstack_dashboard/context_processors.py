@@ -83,6 +83,34 @@ def openstack(request):
     context['keystone_providers'] = keystone_providers
     context['regions'] = regions
 
+    # jt
+    from openstack_dashboard.api import jt
+
+    #context['reseller_logo'] = 'logo2.png'
+    #context['reseller_splash'] = 'logo.png'
+    #fqdn = request.META.get('HTTP_HOST', 'localhost.localdomain')
+    #domain = ""
+    #try:
+    #    domain,blah = fqdn.split('.', 1)
+    #except:
+    #    domain = "localhost"
+    #reseller_logo = jt.get_reseller_logo(domain)
+    #if reseller_logo != 'Information not available.':
+    #    context['reseller_logo'] = reseller_logo
+
+    #reseller_splash = jt.get_reseller_splash(domain)
+    #if reseller_splash != 'Information not available.':
+    #    context['reseller_splash'] = reseller_splash
+
+    dair_admin_notice = jt.get_dair_admin_notice()
+    dair_admin_notice_link = jt.get_dair_admin_notice_link()
+    context['dair_admin_notice'] = ""
+    if dair_admin_notice != None:
+        if dair_admin_notice_link != None:
+            dair_admin_notice = '%s <a href="%s">More information</>.' % (dair_admin_notice, dair_admin_notice_link)
+        context['dair_admin_notice'] = dair_admin_notice
+
+
     # Adding webroot access
     context['WEBROOT'] = getattr(settings, "WEBROOT", "/")
 

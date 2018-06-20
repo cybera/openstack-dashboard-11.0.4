@@ -64,13 +64,17 @@ class UsageView(tables.DataTableView):
 
         # (Used key, Max key, Human Readable Name, text to display when
         # describing the quota by default it is 'Used')
+        # jt / mj - add glance and swift quotas
         types = [("totalInstancesUsed", "maxTotalInstances", _("Instances")),
                  ("totalCoresUsed", "maxTotalCores", _("VCPUs")),
                  ("totalRAMUsed", "maxTotalRAMSize", _("RAM")),
                  ("totalFloatingIpsUsed", "maxTotalFloatingIps",
                   _("Floating IPs"), _("Allocated")),
                  ("totalSecurityGroupsUsed", "maxSecurityGroups",
-                  _("Security Groups"))]
+                  _("Security Groups")),
+                 ("totalImagesUsed", "maxImages", _("Images / Snapshots")),
+                 ("totalObjectSpaceUsed", "maxObjectSpace", _("Object Storage"))
+                 ]
         # Check for volume usage
         if 'totalVolumesUsed' in self.usage.limits and self.usage.limits[
                 'totalVolumesUsed'] >= 0:

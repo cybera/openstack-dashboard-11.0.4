@@ -61,6 +61,38 @@ class ProjectOverview(usage.UsageView):
 
     def get_data(self):
         super(ProjectOverview, self).get_data()
+
+        # jt
+        from openstack_dashboard.api import jt
+        project_id = self.request.user.tenant_id
+
+        # images
+        owned_image_count = jt.get_image_count(project_id, self.request)
+        image_limit = jt.get_image_quota(project_id)
+        self.usage.limits['totalImagesUsed'] = owned_image_count
+        self.usage.limits['maxImages'] = image_limit
+        #self.usage.limits['images'] = {'used': owned_image_count, 'quota': image_limit}
+
+        # expiration
+        self.usage.limits['expiration'] = jt.get_expiration_date(project_id)
+
+        # start date
+        self.usage.limits['start_date'] = jt.get_start_date(project_id)
+
+        # dair notice
+        dair_notice = jt.get_dair_notice(project_id)
+        if dair_notice is not None:
+            dair_notice = dair_notice.strip()
+            if dair_notice != "":
+                self.usage.limits['dair_notice'] = dair_notice
+
+        # object storage
+        object_mb_usage = jt.get_object_mb_usage(project_id)
+        object_mb_limit = jt.get_object_mb_quota(project_id)
+        self.usage.limits['totalObjectSpaceUsed'] = object_mb_usage
+        self.usage.limits['maxObjectSpace'] = object_mb_limit
+        #self.usage.limits['object_mb'] = {'used': object_mb_usage, 'quota': object_mb_limit}
+
         return self.usage.get_instances()
 
 
