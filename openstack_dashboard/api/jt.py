@@ -315,7 +315,7 @@ def get_dair_nova_showback_usage(tenant, start, end):
         db = _dbconnect('nova')
         c = db.cursor()
         query = "SELECT i.created_at, i.deleted_at, it.name FROM instances AS i LEFT JOIN instance_types AS it ON i.instance_type_id=it.id WHERE i.project_id = %s AND i.created_at < %s AND (i.deleted_at > %s OR i.deleted_at IS NULL)"
-        data = (tenant, end_date, start_date)
+        data = [tenant, end_date, start_date]
         c.execute(query, data)
         rows = c.fetchall()
         for row in rows:

@@ -43,6 +43,8 @@ from openstack_dashboard.api import nova
 from openstack_dashboard.api import swift
 from openstack_dashboard.api import vpn
 
+from openstack_dashboard.api import jt
+
 
 __all__ = [
     "base",
@@ -56,4 +58,5 @@ __all__ = [
     "nova",
     "swift",
     "vpn",
+    "jt"
 ]
