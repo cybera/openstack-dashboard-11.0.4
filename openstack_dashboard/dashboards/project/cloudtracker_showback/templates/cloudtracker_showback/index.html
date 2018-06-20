@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block css %}
+{{ block.super }}
+<link href="{{ STATIC_URL }}dashboard/css/invoice.css" type='text/css' media='screen' rel='stylesheet' />
+{% endblock %}
+
+{% block title %}{% trans "CloudTracker Showback" %}{% endblock %}
+
+{% block page_header %}
+{% include "horizon/common/_page_header.html" with title="CloudTracker Showback" %}
+{% endblock page_header %}
+
+{% block main %}
+<div class="usage_info_wrapper">
+<form action="?" method="get" id="date_form" class="form-horizontal">
+  <h3>{% trans "Select a period of time to query usage" %}: </h3>
+  <div class="datepicker">
+    {% blocktrans with start=form.start end=form.end %}<span>From: {{ start }} </span><span>To: {{ end }} </span>{% endblocktrans %}
+    <button class="btn btn-primary" type="submit">{% trans "Submit" %}</button>
+    <small>{% trans "The date should be in YYYY-mm-dd format." %}</small>
+  </div>
+</form>
+</div>
+
+{% if usage %}
+<h2>{%trans "Usage from " %} {{ start_date }} {%trans " to " %} {{ end_date }}</h2>
+    <div class="invoice-box">
+      <h3>{%trans "Instances" %}</h3>
+      <table cellpadding="0" cellspacing="0">
+        <tr class="heading">
+          <!-- <td width="60%">Flavor</td> -->
+          <td width="70%">{%trans "Flavor" %}</td>
+          <td>{%trans "Hours" %}</td>
+          <td width="15%">{%trans "Qty" %}</td>
+          <!--  <td>Price</td> -->
+        </tr>
+        {% for k,v in usage.Instances.items %}
+        <!-- {% if k != "total_cost" %} -->
+        <tr class="item">
+          <td>{{ k }}</td>
+          <td>{{ v.hours }}</td>
+          <td>{{ v.count }}</td>
+          <!-- <td>${{ v.cost|floatformat:2 }}</td > -->
+        </tr>
+        <!-- {% endif %} -->
+        {% endfor %}
+        <!--  <tr class="total">
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>Total: ${{ usage.Instances.total_cost|floatformat:2 }}</td>
+        </tr> -->
+      </table>
+
+      <a href="/project/cloudtracker_showback/csv_instances?start={{ start_date }}&end={{ end_date }}">{%trans "Download CSV" %}</a>
+      <p></p>
+
+      <h3>{%trans "External Bandwidth" %}</h3>
+      <table cellpadding="0" cellspacing="0">
+      <tr class="heading">
+          <td width="70%"></td>
+          <td width="15%">{%trans "In (MB)" %}</td>
+          <td>{%trans "Out (MB)" %}</td>
+        </tr>
+        {% for k,v in usage.Bandwidth.items %}
+          <tr class="item">
+            <td></td>
+            <td>{{ v.bytes_received }}</td>
+            <td>{{ v.bytes_transmitted }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+
+      <a href="/project/cloudtracker_showback/csv_bandwidth?start={{ start_date }}&end={{ end_date }}">{%trans "Download CSV" %}</a>
+      <p></p>
+
+      <h3>{%trans "Snapshots" %}</h3>
+      <table cellpadding="0" cellspacing="0">
+        <tr class="heading">
+          <!--<td width="60%">Name</td> -->
+          <td width="70%">{%trans "Name" %}</td>
+          <td width="15%">{%trans "Hours" %}</td>
+          <td>{%trans "Size (GB)" %}</td>
+          <!-- <td>Price</td> -->
+        <tr>
+        {% for k,v in usage.Snapshots.items %}
+        <!-- {% if k != "total_cost" %} -->
+          <tr class="item">
+            <td>{{ k }}</td>
+            <td>{{ v.hours }}</td>
+            <td>{{ v.size|floatformat:2 }}</td>
+            <!-- <td>${{ v.cost|floatformat:2 }}</td> -->
+          </tr>
+          <!-- {% endif %} -->
+        {% endfor %}
+        <!-- <tr class="total">
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>Total: ${{ usage.Snapshots.total_cost|floatformat:2 }}</td>
+        </tr> -->
+      </table>
+
+      <a href="/project/cloudtracker_showback/csv_snapshots?start={{ start_date }}&end={{ end_date }}">{%trans "Download CSV" %}</a>
+      <p></p>
+
+      <h3>{%trans "Volumes" %}</h3>
+      <table cellpadding="0" cellspacing="0">
+        <tr class="heading">
+          <!-- <td width="60%">Name</td> -->
+          <td width="70%">{%trans "Name" %}</td>
+          <td width="15%">{%trans "Hours" %}</td>
+          <td>{%trans "Size (GB)" %}</td>
+          <!-- <td>Price</td> -->
+        <tr>
+        {% for k,v in usage.Volumes.items %}
+        <!-- {% if k != "total_cost" %} -->
+        <tr class="item">
+          <td>{{ k }}</td>
+          <td>{{ v.hours }}</td>
+          <td>{{ v.size|floatformat:2 }}</td>
+          <!-- <td>${{ v.cost|floatformat:2 }}</td> -->
+        </tr>
+        <!--{% endif %} -->
+        {% endfor %}
+        <!-- <tr class="total">
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>Total: ${{ usage.Volumes.total_cost|floatformat:2 }}</td>
+        </tr> -->
+      </table>
+
+     <!-- <br>
+      <table cellpadding="0" cellspacing="0">
+       <tr class="total">
+          <td width="70%"><b>Total</b></td>
+          <td></td>
+          <td></td>
+          <td>${{ grand_total|floatformat:2 }}</td>
+        </tr>
+      </table> -->
+
+     <a href="/project/cloudtracker_showback/csv_volumes?start={{ start_date }}&end={{ end_date }}">{%trans "Download CSV" %}</a>
+     <p></p>
+
+      <h3>{%trans "Object Storage" %}</h3>
+      <table cellpadding="0" cellspacing="0">
+      <tr class="heading">
+          <td width="40%">{%trans "Space usage (Mb)"%}</td>
+          <td width="30%">{%trans "Container count" %}</td>
+          <td>{%trans "Object count" %}</td>
+        </tr>
+        {% for k,v in usage.Swift.items %}
+          <tr class="item">
+            <td>{{ v.space_usage }}</td>
+            <td>{{ v.container_count }}</td>
+            <td>{{ v.object_count }}</td>
+        {% endfor %}
+      </table>
+
+      <a href="/project/cloudtracker_showback/csv_swift?start={{ start_date }}&end={{ end_date }}">{%trans "Download CSV" %}</a>
+      <p></p>
+
+      <hr class="style1">
+
+      <a href="/project/cloudtracker_showback/csv_summary?start={{ start_date }}&end={{ end_date }}">{%trans "Download CSV Summary" %}</a>
+      <p></p>
+
+      <a href="/project/cloudtracker_showback/xml_summary?start={{ start_date }}&end={{ end_date }}">{%trans "Download XLS Summary" %}</a>
+      <p></p>
+    </div>
+{% endif %}
+{% endblock %}
+
+
