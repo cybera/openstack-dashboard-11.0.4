@@ -27,6 +27,18 @@ from openstack_dashboard.dashboards.project.instances \
     import tables as project_tables
 from openstack_dashboard import policy
 
+# jt
+class GraphLink(tables.LinkAction):
+    name = "graph"
+    verbose_name = _("View Usage - Graph")
+    url = "horizon:admin:instances:update"
+    classes = ("btn-graph",)
+
+    def get_link_url(self, instance):
+      print instance.tenant_id
+      #tm
+      #return "http://graphite.dair-atir.canarie.ca/grafana/#/dashboard/script/dair-instance.js?project=%s&instance=%s" % (instance.tenant_id, instance.id)
+      return "http://grafana.dair-atir.canarie.ca/dashboard/db/real-usage-per-instance?var-project=%s&var-instance=%s" % (instance.tenant_id, instance.id)
 
 class AdminEditInstance(project_tables.EditInstance):
     url = "horizon:admin:instances:update"
@@ -178,6 +190,8 @@ class AdminInstancesTable(tables.DataTable):
         row_actions = (project_tables.ConfirmResize,
                        project_tables.RevertResize,
                        AdminEditInstance,
+		       # jt
+		       GraphLink,
                        AdminConsoleLink,
                        AdminLogLink,
                        project_tables.CreateSnapshot,
