@@ -286,22 +286,18 @@ DEFAULT_THEME_PATH = None
 # 'key', 'label', 'path'
 AVAILABLE_THEMES = [
     (
-        'ubuntu',
-        pgettext_lazy('Ubuntu theme', 'Ubuntu'),
-        'themes/ubuntu'
-    ), (
         'default',
         pgettext_lazy('Default style theme', 'Default'),
         'themes/default'
-    ), (
-        'material',
-        pgettext_lazy("Google's Material Design style theme", "Material"),
-        'themes/material'
+    #), (
+    #    'material',
+    #    pgettext_lazy("Google's Material Design style theme", "Material"),
+    #    'themes/material'
     ),
 ]
 
 # The default theme if no cookie is present
-DEFAULT_THEME = 'ubuntu'
+DEFAULT_THEME = 'default'
 
 # Theme Static Directory
 THEME_COLLECTION_DIR = 'themes'
