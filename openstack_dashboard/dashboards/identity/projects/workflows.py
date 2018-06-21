@@ -37,6 +37,9 @@ from openstack_dashboard.api import nova
 from openstack_dashboard.usage import quotas
 from openstack_dashboard.utils import identity as identity
 
+# MJ
+import datetime
+
 
 LOG = logging.getLogger(__name__)
 
@@ -47,6 +50,59 @@ PROJECT_GROUP_ENABLED = keystone.VERSIONS.active >= 3
 PROJECT_USER_MEMBER_SLUG = "update_members"
 PROJECT_GROUP_MEMBER_SLUG = "update_group_members"
 COMMON_HORIZONTAL_TEMPLATE = "identity/projects/_common_horizontal_form.html"
+
+
+# jt
+def get_admin_tenant_id(request):
+    tenants = api.keystone.tenant_list(request)[0]
+    admin_tenant_id = [tenant.id for tenant in tenants if tenant.name == 'admin'][0]
+    return admin_tenant_id
+
+
+# jt
+class UpdateDAIRAction(workflows.Action):
+    expiration = forms.CharField(max_length=50, label=_("Expiration Date"))
+    start_date = forms.CharField(max_length=50, label=_("Start Date"))
+    dair_notice = forms.CharField(max_length=750, label=_("Notice from DAIR"), required=False)
+    dair_notice_link = forms.CharField(max_length=750, label=_("Optional URL"), required=False)
+    reseller_logo = forms.CharField(max_length=100, label=_("Reseller Logo"), required=False)
+    #tm
+    research_participant = forms.CharField(max_length=100, label=_("Research Software Participant"), required=False)
+
+    def __init__(self, request, *args, **kwargs):
+        super(UpdateDAIRAction, self).__init__(request,
+                                               *args,
+                                               **kwargs)
+        if 'project_id' in args[0]:
+            project_id = args[0]['project_id']
+            self.fields['expiration'].initial = api.jt.get_expiration_date(project_id)
+            self.fields['start_date'].initial = api.jt.get_start_date(project_id)
+            self.fields['dair_notice'].initial = api.jt.get_dair_notice(project_id)
+            self.fields['dair_notice_link'].initial = api.jt.get_dair_notice_link(project_id)
+            self.fields['reseller_logo'].initial = api.jt.get_reseller_logo(project_id)
+            self.fields['research_participant'].initial = api.jt.get_research_participant(project_id)
+        else:
+            start_date = datetime.date.today()
+            future_expire_date = start_date.replace(year=start_date.year+1).strftime('%B %d, %Y')
+            self.fields['start_date'].initial = start_date.strftime('%B %d, %Y')
+            self.fields['expiration'].initial = future_expire_date
+            self.fields['dair_notice'].initial = ''
+            self.fields['dair_notice_link'].initial = ''
+            self.fields['reseller_logo'].initial = ''
+            #tm
+            self.fields['research_participant'].initial = ''
+
+    class Meta:
+        name = _("DAIR")
+        slug = 'update_dair'
+        help_text = _("From here you can set DAIR information for the project.")
+
+
+# jt
+class UpdateDAIR(workflows.Step):
+    action_class = UpdateDAIRAction
+    depends_on = ("project_id",)
+    contributes = ('expiration', 'start_date', 'dair_notice', 'dair_notice_link', 'reseller_logo','research_participant',)
 
 
 class ProjectQuotaAction(workflows.Action):
@@ -74,6 +130,9 @@ class ProjectQuotaAction(workflows.Action):
                                          label=_("Security Groups"))
     security_group_rules = forms.IntegerField(min_value=-1,
                                               label=_("Security Group Rules"))
+    # jt
+    object_mb = forms.IntegerField(min_value=0, label=_("Object Storage (MB)"))
+    images = forms.IntegerField(min_value=0, label=_("Images"))
 
     # Neutron
     security_group = forms.IntegerField(min_value=-1,
@@ -95,6 +154,16 @@ class ProjectQuotaAction(workflows.Action):
             if field in self.fields:
                 self.fields[field].required = False
                 self.fields[field].widget = forms.HiddenInput()
+
+        # jt
+        if 'project_id' in args[0]:
+            project_id = args[0]['project_id']
+            self.fields['images'].initial = api.jt.get_image_quota(project_id)
+            self.fields['object_mb'].initial = api.jt.get_object_mb_quota(project_id)
+        else:
+            # MJ expiration autofill
+            self.fields['images'].initial = 5
+            self.fields['object_mb'].initial = 204800
 
 
 class UpdateProjectQuotaAction(ProjectQuotaAction):
@@ -137,14 +206,20 @@ class UpdateProjectQuota(workflows.Step):
     action_class = UpdateProjectQuotaAction
     template_name = COMMON_HORIZONTAL_TEMPLATE
     depends_on = ("project_id",)
-    contributes = quotas.QUOTA_FIELDS
+    # jt
+    #contributes = quotas.QUOTA_FIELDS
+    QUOTA_FIELDS = quotas.QUOTA_FIELDS + ('object_mb', 'images',)
+    contributes = QUOTA_FIELDS
 
 
 class CreateProjectQuota(workflows.Step):
     action_class = CreateProjectQuotaAction
     template_name = COMMON_HORIZONTAL_TEMPLATE
     depends_on = ("project_id",)
-    contributes = quotas.QUOTA_FIELDS
+    # jt
+    #contributes = quotas.QUOTA_FIELDS
+    QUOTA_FIELDS = quotas.QUOTA_FIELDS + ('object_mb', 'images',)
+    contributes = QUOTA_FIELDS
 
 
 class CreateProjectInfoAction(workflows.Action):
@@ -442,7 +517,8 @@ class CreateProject(CommonQuotaWorkflow):
     success_url = "horizon:identity:projects:index"
     default_steps = (CreateProjectInfo,
                      UpdateProjectMembers,
-                     CreateProjectQuota)
+                     CreateProjectQuota,
+                     UpdateDAIR) # jt
 
     def __init__(self, request=None, context_seed=None, entry_point=None,
                  *args, **kwargs):
@@ -450,7 +526,8 @@ class CreateProject(CommonQuotaWorkflow):
             self.default_steps = (CreateProjectInfo,
                                   UpdateProjectMembers,
                                   UpdateProjectGroups,
-                                  CreateProjectQuota)
+                                  CreateProjectQuota,
+                                  UpdateDAIR) # jt
         super(CreateProject, self).__init__(request=request,
                                             context_seed=context_seed,
                                             entry_point=entry_point,
@@ -513,6 +590,16 @@ class CreateProject(CommonQuotaWorkflow):
                                                       role=role.id)
                     users_added += 1
                 users_to_add -= users_added
+
+            # jt
+            # Make sure admin is added to the project as a ResellerAdmin
+            users = api.keystone.user_list(request)
+            admin_id = [user.id for user in users if user.name == 'admin'][0]
+            reseller_admin_role_id = [role.id for role in available_roles if role.name == 'ResellerAdmin'][0]
+            api.keystone.add_tenant_user_role(request,
+                                              project=project_id,
+                                              user=admin_id,
+                                              role=reseller_admin_role_id)
         except Exception:
             if PROJECT_GROUP_ENABLED:
                 group_msg = _(", add project groups")
@@ -561,12 +648,35 @@ class CreateProject(CommonQuotaWorkflow):
         except Exception:
             exceptions.handle(request, _('Unable to set project quotas.'))
 
+    # jt
+    def _update_dair_information(self, request, data, project_id):
+        try:
+            if data['images'] != 5:
+                api.jt.set_image_quota(project_id, data['images'])
+            if data['expiration'] != 'Information not available.':
+                api.jt.set_expiration_date(project_id, data['expiration'])
+            if data['start_date'] != 'Information not available.':
+                api.jt.set_start_date(project_id, data['start_date'])
+            if data['dair_notice'] != '':
+                api.jt.set_dair_notice(project_id, data['dair_notice'], False)
+            if data['dair_notice_link'] != '':
+                api.jt.set_dair_notice_link(project_id, data['dair_notice_link'], False)
+            if data['object_mb'] != 204800:
+                api.jt.set_object_mb_quota(project_id, data['object_mb'])
+            if data['reseller_logo'] != 'Information not available.':
+                api.jt.set_reseller_logo(project_id, data['reseller_logo'])
+            if data['research_participant'] != '':
+                api.jt.set_research_participant(project_id, data['research_participant'])
+        except Exception as e:
+            exceptions.handle(request, _('Unable to set DAIR information.'))
+
     def handle(self, request, data):
         project = self._create_project(request, data)
         if not project:
             return False
         project_id = project.id
         self._update_project_members(request, data, project_id)
+        self._update_dair_information(request, data, project_id) # jt
         if PROJECT_GROUP_ENABLED:
             self._update_project_groups(request, data, project_id)
         if keystone.is_cloud_admin(request):
@@ -654,7 +764,8 @@ class UpdateProject(CommonQuotaWorkflow):
     success_url = "horizon:identity:projects:index"
     default_steps = (UpdateProjectInfo,
                      UpdateProjectMembers,
-                     UpdateProjectQuota)
+                     UpdateProjectQuota,
+                     UpdateDAIR) # jt
 
     def __init__(self, request=None, context_seed=None, entry_point=None,
                  *args, **kwargs):
@@ -662,7 +773,8 @@ class UpdateProject(CommonQuotaWorkflow):
             self.default_steps = (UpdateProjectInfo,
                                   UpdateProjectMembers,
                                   UpdateProjectGroups,
-                                  UpdateProjectQuota)
+                                  UpdateProjectQuota,
+                                  UpdateDAIR) # jt
 
         super(UpdateProject, self).__init__(request=request,
                                             context_seed=context_seed,
@@ -931,6 +1043,27 @@ class UpdateProject(CommonQuotaWorkflow):
                                          'project quotas.'))
             return False
 
+    # jt
+    def _update_dair_information(self, request, data, project_id):
+        try:
+            api.jt.set_image_quota(project_id, data['images'])
+            api.jt.set_expiration_date(project_id, data['expiration'])
+            api.jt.set_start_date(project_id, data['start_date'])
+            api.jt.set_object_mb_quota(project_id, data['object_mb'])
+            api.jt.set_reseller_logo(project_id, data['reseller_logo'])
+            api.jt.set_research_participant(project_id, data['research_participant'])
+
+            is_admin_notice = False
+            admin_tenant_id = get_admin_tenant_id(request)
+            if admin_tenant_id == project_id:
+                is_admin_notice = True
+            api.jt.set_dair_notice(project_id, data['dair_notice'], is_admin_notice)
+            api.jt.set_dair_notice_link(project_id, data['dair_notice_link'], is_admin_notice)
+        except Exception:
+            exceptions.handle(request, _('Unable to set DAIR information.'))
+            return False
+        return True
+
     def handle(self, request, data):
         # FIXME(gabriel): This should be refactored to use Python's built-in
         # sets and do this all in a single "roles to add" and "roles to remove"
@@ -958,6 +1091,11 @@ class UpdateProject(CommonQuotaWorkflow):
             ret = self._update_project_quota(request, data, project_id)
             if not ret:
                 return False
+
+        # jt
+        ret = self._update_dair_information(request, data, project_id)
+        if not ret:
+            return False
 
         return True
 

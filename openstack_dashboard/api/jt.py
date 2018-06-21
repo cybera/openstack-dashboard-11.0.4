@@ -70,7 +70,7 @@ def set_expiration_date(project_id, expiration_date):
         c = db.cursor()
         expiration_date = parser.parse(expiration_date)
         query = "INSERT INTO project_information (project_id, expiration_date) VALUES (%s, %s) ON DUPLICATE KEY UPDATE expiration_date = %s"
-        data = (project_id, expiration_date, expiration_date)
+        data = [project_id, expiration_date, expiration_date]
         c.execute(query, data)
         db.commit()
     except Exception as e:
@@ -97,7 +97,7 @@ def set_start_date(project_id, start_date):
         c = db.cursor()
         start_date = parser.parse(start_date)
         query = "INSERT INTO project_information (project_id, start_date) VALUES (%s, %s) ON DUPLICATE KEY UPDATE start_date = %s"
-        data = (project_id, start_date, start_date)
+        data = [project_id, start_date, start_date]
         c.execute(query, data)
         db.commit()
     except Exception as e:
@@ -140,7 +140,7 @@ def set_dair_notice(project_id, notice, is_admin_notice):
         db = _dbconnect()
         c = db.cursor()
         query = "INSERT INTO project_information (project_id, notice) VALUES (%s, %s) ON DUPLICATE KEY UPDATE notice = %s"
-        data = (project_id, notice, notice)
+        data = [project_id, notice, notice]
         c.execute(query, data)
         db.commit()
     except Exception as e:
@@ -151,7 +151,7 @@ def set_research_participant(project_id, research_participant):
         db = _dbconnect()
         c = db.cursor()
         query = "INSERT INTO project_information (project_id, research_participant) VALUES (%s, %s) ON DUPLICATE KEY UPDATE research_participant = %s"
-        data = (project_id, research_participant, research_participant)
+        data = [project_id, research_participant, research_participant]
         c.execute(query, data)
         db.commit()
     except Exception as e:
@@ -179,7 +179,7 @@ def set_dair_notice_link(project_id, link, is_admin_notice):
         db = _dbconnect()
         c = db.cursor()
         query = "INSERT INTO project_information (project_id, notice_link) VALUES (%s, %s) ON DUPLICATE KEY UPDATE notice_link = %s"
-        data = (project_id, link, link)
+        data = [project_id, link, link]
         c.execute(query, data)
         db.commit()
     except Exception as e:
@@ -362,7 +362,7 @@ def get_dair_glance_showback_usage(tenant, start, end):
         db = _dbconnect('glance')
         c = db.cursor()
         query = "SELECT created_at, deleted_at, name, size FROM images WHERE owner = %s AND created_at < %s AND (deleted_at > %s OR deleted_at IS NULL) AND status != 'killed'"
-        data = (tenant, end_date, start_date)
+        data = [tenant, end_date, start_date]
         c.execute(query, data)
         rows = c.fetchall()
         for row in rows:
@@ -400,7 +400,7 @@ def get_dair_cinder_showback_usage(tenant, start, end):
         db = _dbconnect('cinder')
         c = db.cursor()
         query = "SELECT created_at, deleted_at, display_name, size FROM volumes WHERE project_id = %s AND created_at < %s AND (deleted_at > %s OR deleted_at IS NULL)"
-        data = (tenant, end_date, start_date)
+        data = [tenant, end_date, start_date]
         c.execute(query, data)
         rows = c.fetchall()
         for row in rows:
