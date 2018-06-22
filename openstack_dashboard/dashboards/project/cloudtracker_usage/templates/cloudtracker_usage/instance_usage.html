@@ -1,7 +1,8 @@
 {% load i18n %}
 
+<br>
 <form name="instance_usage" method="GET" action="index">
-  <select name="from">
+  <select class="btn btn-default" name="from">
     {% for from_label, from_value in time %}
       {% if from_value == request.GET.from %}
         <option selected value="{{ from_value }}">{{ from_label }}</option>
@@ -11,7 +12,7 @@
     {% endfor %}
   </select>
 
-  <select name="instance">
+  <select class="btn btn-default" name="instance">
   {% for instance in instances %}
     {% if instance.id == request.GET.instance %}
       <option selected value="{{ instance.id }}">{{ instance.name }}</option>
@@ -23,7 +24,7 @@
 
   <input type="hidden" name="tab" value="cloudtracker_usage__instances">
 
-  <button type="submit">{%trans "Submit" %}</button>
+  <button class="btn btn-default" type="submit">{%trans "Submit" %}</button>
 </form>
 
 {% if request.GET.instance %}
