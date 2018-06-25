@@ -32,6 +32,230 @@ msgstr ""
 "X-Generator: Zanata 3.9.6\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
 
+# Start Cybera Translation
+# tm / jt / mj
+
+msgid "instances-from"
+msgstr "instances-du"
+
+msgid "snapshots-from"
+msgstr "snapshots-du"
+
+msgid "volumes-from"
+msgstr "volumes-du"
+
+msgid "bandwidth-from"
+msgstr "débit_extere-du"
+
+msgid "object_storage-from"
+msgstr "stockage_d'objets-du"
+
+msgid "summary-from"
+msgstr "sommaire-du"
+
+msgid "to"
+msgstr "au"
+
+msgid "number of instances in"
+msgstr "nombre d'instances en"
+
+msgid "number of virtual cpus in"
+msgstr "nombre d'UC virtuelles en"
+
+msgid "memory usage in"
+msgstr "mémoire utilisée en"
+
+msgid "memory usage in "
+msgstr "memoire utilisee en"
+
+msgid "disk usage in"
+msgstr "espace disque utilisé en"
+
+msgid "disk usage in "
+msgstr "espace disque utilise en"
+
+msgid "Download Summary CSV"
+msgstr "Télécharger le sommaire CSV"
+
+msgid "Project_Usage_Summary"
+msgstr "Sommaire_de_l'utilisation_par_les_projets"
+
+msgid "timestamp"
+msgstr "horodatage"
+
+msgid "Instance_Usage_Summary"
+msgstr "Sommaire_de_l'utilisation_des_instances"
+
+msgid "cpu_time"
+msgstr "utilisation de l'UC"
+
+msgid "memory available"
+msgstr "mémoire disponible"
+
+msgid "memory available "
+msgstr "mémoire disponible "
+
+msgid "memory used"
+msgstr "mémoire utilisée"
+
+msgid "memory used "
+msgstr "memoire utilisee"
+
+msgid "bytes_used"
+msgstr "nombre d'octets utilisé"
+
+msgid "bytes_used "
+msgstr "nombre d'octets utilise"
+
+msgid "wr_req (writes)"
+msgstr "wr_req (écritures)"
+
+msgid "wr_req (writes) "
+msgstr "wr_req (ecritures)"
+
+msgid "rd_req (reads)"
+msgstr "rd_req (lectures)"
+
+msgid "rx_bytes (received)"
+msgstr "rx_bytes (reçus)"
+
+msgid "rx_bytes (received) "
+msgstr "rx_bytes (recus)"
+
+msgid "tx_bytes (transmitted)"
+msgstr "tx_bytes (transmis)"
+
+msgid "Download XLS Summary"
+msgstr "Télécharger le sommaire XLS"
+
+msgid "Space usage (Mb)"
+msgstr "Espace utilisé (Mo)"
+
+msgid "Space usage"
+msgstr "Espace utilise"
+
+msgid "Container count"
+msgstr "Nombre de contenants"
+
+msgid "Object count"
+msgstr "Nombre d'objets"
+
+msgid "Qty"
+msgstr "Quantité"
+
+msgid "Quantity"
+msgstr "Quantite"
+
+msgid "Usage from "
+msgstr "Utilisation du "
+
+msgid " to "
+msgstr " au "
+
+msgid "Hours"
+msgstr "Heures"
+
+msgid "7 Days"
+msgstr "7 jours"
+
+msgid "14 Days"
+msgstr "14 jours"
+
+msgid "30 Days"
+msgstr "30 jours"
+
+msgid "90 Days"
+msgstr "90 jours"
+
+msgid "DAIR Usage"
+msgstr "Utilisation de l'ATIR"
+
+msgid "CloudTracker"
+msgstr "CloudTracker"
+
+msgid "Usage Graphs"
+msgstr "Graphiques"
+
+msgid "Showback"
+msgstr "Réaffichag"
+
+msgid "DAIR Showback"
+msgstr "Réaffichag de l'ATIR"
+
+msgid "CloudTracker Showback"
+msgstr "Réaffichag de le CloudTracker"
+
+msgid "Instance Usage"
+msgstr "Utilisation des instances"
+
+msgid "Submit"
+msgstr "Soumettre"
+
+msgid "Memory (Gb)"
+msgstr "Mémoire(Go)"
+
+msgid "Ephemeral Disk (Gb)"
+msgstr "Disque éphémè(Go)"
+
+msgid "The following shows allocate usage of the cloud. It does not reflect actual usage of instances."
+msgstr "Montre comment le nuage est utilisé. Ne reflète pas l'usage réel des instanes."
+
+msgid "CPU Time (Seconds)"
+msgstr "Usage du CPU (secondes)"
+
+msgid "A sum of the number of seconds a CPU is active in a 5 minute period. A higher value denotes higher CPU usage."
+msgstr "Usage du CPU supérieur."
+
+msgid "The total amount of memory consumed by the instance."
+msgstr "Mémoire totale utilisée pa l'instance."
+
+msgid "Network (Bytes)"
+msgstr "Réseau(octets)"
+
+msgid "The total bandwidth used in bytes. This does not differentiate between external or internal traffic."
+msgstr "Débit total en octets. Ne distingue pas le trafic externe du trafic interne"
+
+msgid "Size of the root disk."
+msgstr "Taille du disque racine."
+
+msgid "Disk IO"
+msgstr "IO du disque"
+
+msgid "The number of input/output operations on a physical disk."
+msgstr "Nombre d'opérations entrée/sortie du disque physue."
+
+msgid "Select a period of time to query usage"
+msgstr "Choisir une période pour réafficher l'utilisation"
+
+msgid "The date should be in YYYY-mm-dd format."
+msgstr "Formater la date AAAA-mm-jj"
+
+msgid "External Bandwidth"
+msgstr "Débit extere"
+
+msgid "External Bandwidth "
+msgstr "Debit extere"
+
+msgid "In (MB)"
+msgstr "Entrées (Mo)"
+
+msgid "In (Mb)"
+msgstr "Entrees (Mo)"
+
+msgid "Download CSV"
+msgstr "Téléchargeme CSV"
+
+msgid "Out (MB)"
+msgstr "Sorties (Mo)"
+
+msgid "Out (Mb)"
+msgstr "Sorties (Mo)"
+
+msgid "Object Storage"
+msgstr "Stockage d'objets"
+
+# End Cybera Translation
+
 msgid " - End"
 msgstr "- Fin"
 
@@ -7025,8 +7249,9 @@ msgctxt "Current status of an Instance"
 msgid "Stopped"
 msgstr "Stoppé"
 
-msgid "Submit"
-msgstr "Envoyer"
+# mj / tm / jt - use CANARIE translation at top of doc instead
+#msgid "Submit"
+#msgstr "Envoyer"
 
 msgid "Subnet"
 msgstr "Sous-réseau"
