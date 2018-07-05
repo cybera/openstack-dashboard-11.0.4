@@ -471,10 +471,12 @@ class FloatingIpManager(network_base.FloatingIpManager):
                       if (r.external_gateway_info and
                           r.external_gateway_info.get('network_id')
                           in ext_net_ids)]
-        reachable_subnets = set([p.fixed_ips[0]['subnet_id'] for p in ports
-                                if ((p.device_owner in
-                                     ROUTER_INTERFACE_OWNERS)
-                                    and (p.device_id in gw_routers))])
+        #mj - don't filter any because our setup has an admin only router and subnets are not shared
+        reachable_subnets = set([p.fixed_ips[0]['subnet_id'] for p in ports])
+        #reachable_subnets = set([p.fixed_ips[0]['subnet_id'] for p in ports
+        #                        if ((p.device_owner in
+        #                             ROUTER_INTERFACE_OWNERS)
+        #                            and (p.device_id in gw_routers))])
         # we have to include any shared subnets as well because we may not
         # have permission to see the router interface to infer connectivity
         shared = set([s.id for n in network_list(self.request, shared=True)
