@@ -424,3 +424,28 @@ def get_dair_cinder_showback_usage(tenant, start, end):
         print(str(e))
         return "Information not available..."
     return usage
+
+def get_totp_secrets(user_id):
+    db = _dbconnect()
+    c = db.cursor()
+    query = "SELECT id, name, secret FROM totp WHERE user_id = %s AND deleted = 0"
+    data = [user_id]
+    c.execute(query, data)
+    rows = c.fetchall()
+    return rows
+
+def set_totp_secret(user_id, name, secret):
+    db = _dbconnect()
+    c = db.cursor()
+    query = "INSERT INTO totp (user_id, name, secret) VALUES (%s, %s, %s)"
+    data = [user_id, name, secret]
+    c.execute(query, data)
+    db.commit()
+
+def delete_totp_secret(totp_id):
+    db = _dbconnect()
+    c = db.cursor()
+    query = "UPDATE totp SET deleted = 1 WHERE id = %s"
+    data = [totp_id]
+    c.execute(query, data)
+    db.commit()

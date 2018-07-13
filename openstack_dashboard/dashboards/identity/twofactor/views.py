@@ -12,22 +12,20 @@ from openstack_dashboard.dashboards.identity.twofactor \
     import forms as twofactor_forms
 from openstack_dashboard.dashboards.identity.twofactor \
     import tables as twofactor_tables
+from openstack_dashboard.api import jt
 
 class IndexView(tables.DataTableView):
     table_class = twofactor_tables.FactorsTable
-    #template_name = 'identity/users/index.html'
     page_title = "Two-factor Authentication"
 
     def has_more_data(self, table):
 	return False
-        #return self._more
 
     def get_data(self):
-        data = [
-            Factor(1, "Foo"),
-            Factor(2, "Bar"),
-            Factor(3, "Baz")
-        ]
+        data = []
+        secrets = jt.get_totp_secrets(self.request.user.id)
+        for s in secrets:
+            data.append(Factor(s[0], s[1], s[2]))
         return data
 
 class CreateView(forms.ModalFormView):
@@ -41,10 +39,7 @@ class CreateView(forms.ModalFormView):
     page_title = _("Create Factor")
 
 class Factor(object):
-    def __init__(self, id, name):
+    def __init__(self, id, name, secret):
         self.id = id
         self.name = name
-        self.secret = self._rand_str()
-
-    def _rand_str(self):
-        return ''.join([random.choice(string.lowercase) for i in xrange(26)])
+        self.secret = secret

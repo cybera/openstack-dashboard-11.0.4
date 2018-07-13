@@ -4,6 +4,8 @@ from django.utils.translation import ungettext_lazy
 from horizon import forms
 from horizon import tables
 
+from openstack_dashboard.api import jt
+
 class CreateFactor(tables.LinkAction):
     name = "create"
     verbose_name = _("Create Factor")
@@ -29,7 +31,7 @@ class DeleteFactorsAction(tables.DeleteAction):
         )
 
     def delete(self, request, obj_id):
-        pass
+        jt.delete_totp_secret(obj_id)
 
 class UpdateRow(tables.Row):
     ajax = True
@@ -38,6 +40,8 @@ class UpdateRow(tables.Row):
         pass
 
 class FactorsTable(tables.DataTable):
+    id = tables.Column('id', verbose_name=_('ID'),
+            form_field=forms.IntegerField())
     name = tables.Column('name', verbose_name=_('Name'),
                            form_field=forms.CharField(max_length=64))
     secret = tables.Column('secret', verbose_name=_('Secret'),
