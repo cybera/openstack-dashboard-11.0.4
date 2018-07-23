@@ -7,4 +7,8 @@ class TwoFactorAuth(horizon.Panel):
     slug = '2fa'
 
     def can_access(self, context):
-        return True
+        request = context['request']
+        for role in request.user.roles:
+            if role['name'] == 'admin':
+                return True
+        return False
