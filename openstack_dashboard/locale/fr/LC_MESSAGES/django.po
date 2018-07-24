@@ -1473,8 +1473,9 @@ msgstr "CSV des IDs distants valides depuis le fournisseur d'identité."
 msgid "Comma-separated key=value pairs"
 msgstr "Paires clé=valeur séparées par des virgules"
 
+#: dair
 msgid "Compute"
-msgstr "Compute"
+msgstr "Calcul"
 
 msgid "Compute Host"
 msgstr "Hôte Compute"
