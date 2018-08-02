@@ -80,8 +80,10 @@ class CreateForm(forms.SelfHandlingForm):
             messages.warning(request, msg)
             networks = []
 
-        choices = [(network.id, network.name or network.id)
-                   for network in networks]
+        #mj - disable choosing an external gateway
+        choices = []
+        #choices = [(network.id, network.name or network.id)
+        #           for network in networks]
         if choices:
             choices.insert(0, ("", _("Select network")))
         return choices
