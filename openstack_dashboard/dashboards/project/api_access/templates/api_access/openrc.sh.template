@@ -11,18 +11,23 @@
 # OpenStack API is version 3. For example, your cloud provider may implement
 # Image API v1.1, Block Storage API v2, and Compute API v2.0. OS_AUTH_URL is
 # only for the Identity API served through keystone.
-export OS_AUTH_URL={{ auth_url }}
+export OS_AUTH_URL={{ auth_url }}v3/
 
 # With the addition of Keystone we have standardized on the term **project**
 # as the entity that owns the resources.
 export OS_PROJECT_ID={{ tenant_id }}
 export OS_PROJECT_NAME="{{ tenant_name|shellfilter }}"
-export OS_USER_DOMAIN_NAME="{{ user_domain_name|shellfilter }}"
+export OS_DOMAIN_NAME="Default"
+export OS_USER_DOMAIN_NAME="Default"
 if [ -z "$OS_USER_DOMAIN_NAME" ]; then unset OS_USER_DOMAIN_NAME; fi
 
 # unset v2.0 items in case set
 unset OS_TENANT_ID
 unset OS_TENANT_NAME
+
+# But reset them as some applications (eg. Docker) still use them
+export OS_TENANT_ID={{ tenant_id }}
+export OS_TENANT_NAME="{{ tenant_name|shellfilter }}"
 
 # In addition to the owning entity (tenant), OpenStack stores the entity
 # performing the action as the **user**.
@@ -41,3 +46,9 @@ if [ -z "$OS_REGION_NAME" ]; then unset OS_REGION_NAME; fi
 
 export OS_INTERFACE={{ interface }}
 export OS_IDENTITY_API_VERSION={{ os_identity_api_version }}
+
+# Environment variables used by other tools
+# Uncomment these to use them
+#export OS_SECURITY_GROUPS=default
+#export OS_NETWORK_NAME=private
+#export OS_FLOATINGIP_POOL=public
