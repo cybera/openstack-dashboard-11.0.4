@@ -234,6 +234,9 @@ class IndexView(tables.DataTableView):
     def get_data(self):
         services = []
         for i, service in enumerate(self.request.user.service_catalog):
+            if service['endpoints'][0]['region'] != self.request.user.services_region:
+                continue
+
             service['id'] = i
             services.append(
                 api.keystone.Service(service,
