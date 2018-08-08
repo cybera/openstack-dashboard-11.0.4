@@ -304,7 +304,11 @@ def url_for(request, service_type, endpoint_type=None, region=None):
                                              'publicURL')
     fallback_endpoint_type = getattr(settings, 'SECONDARY_ENDPOINT_TYPE', None)
 
-    catalog = request.user.service_catalog
+    # mj - this should not be required
+    #catalog = request.user.service_catalog
+    catalog = [service for service in request.user.service_catalog
+        if service['endpoints'][0]['region'] == request.user.services_region]
+
     service = get_service_from_catalog(catalog, service_type)
     if service:
         if not region:
@@ -322,7 +326,11 @@ def url_for(request, service_type, endpoint_type=None, region=None):
 
 
 def is_service_enabled(request, service_type):
-    service = get_service_from_catalog(request.user.service_catalog,
+    # mj - this should not be required
+    catalog = [service for service in request.user.service_catalog
+        if service['endpoints'][0]['region'] == request.user.services_region]
+    #service = get_service_from_catalog(request.user.service_catalog,
+    service = get_service_from_catalog(catalog,
                                        service_type)
     if service:
         region = request.user.services_region
