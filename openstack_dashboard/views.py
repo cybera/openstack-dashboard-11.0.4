@@ -30,14 +30,15 @@ def get_user_home(user):
         token = user.token
     except AttributeError:
         raise exceptions.NotAuthenticated()
+    # mj - we don't actually want this override
     # Domain Admin, Project Admin will default to identity
-    if token.project.get('id') is None or user.is_superuser:
-        try:
-            dashboard = horizon.get_dashboard('identity')
-        except base.NotRegistered:
-            pass
-    else:
-        dashboard = horizon.get_default_dashboard()
+    #if token.project.get('id') is None or user.is_superuser:
+    #    try:
+    #        dashboard = horizon.get_dashboard('identity')
+    #    except base.NotRegistered:
+    #        pass
+    #else:
+    dashboard = horizon.get_default_dashboard()
 
     return dashboard.get_absolute_url()
 
