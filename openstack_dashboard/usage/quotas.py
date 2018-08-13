@@ -163,6 +163,20 @@ def _get_quota_data(request, tenant_mode=True, disabled_quotas=None,
             disabled_quotas.update(CINDER_QUOTA_FIELDS)
             msg = _("Unable to retrieve volume limit information.")
             exceptions.handle(request, msg)
+
+    #mj - add the tenant_quota info from neutron - this is replaced in Queens
+    if 'network' not in disabled_quotas:
+	try:
+            if tenant_mode:
+		quotasets.append(neutron.tenant_quota_get(request,
+                                                      tenant_id=tenant_id))
+            else:
+                quotasets.append(neutron.default_quota_get(request, tenant_id))
+
+        except Exception:
+            disabled_quotas.update(NEUTRON_QUOTA_FIELDS)
+            msg = _('Unable to retrieve Neutron quota information.')
+
     for quota in itertools.chain(*quotasets):
         if quota.name not in disabled_quotas:
             qs[quota.name] = quota.limit
@@ -184,15 +198,13 @@ def get_tenant_quota_data(request, disabled_quotas=None, tenant_id=None):
                          disabled_quotas=disabled_quotas,
                          tenant_id=tenant_id)
 
-    # TODO(jpichon): There is no API to get the default system quotas
-    # in Neutron (cf. LP#1204956), so for now handle tenant quotas here.
-    # This should be handled in _get_quota_data() eventually.
     if not disabled_quotas:
         return qs
 
     # Check if neutron is enabled by looking for network
     if 'network' not in disabled_quotas:
-        tenant_id = tenant_id or request.user.tenant_id
+        # mj - another quota hack. This is fixed properly in Queens.
+        #tenant_id = tenant_id or request.user.tenant_id
         neutron_quotas = neutron.tenant_quota_get(request, tenant_id)
     if 'floating_ips' in disabled_quotas:
         # Neutron with quota extension disabled

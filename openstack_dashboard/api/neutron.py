@@ -1119,6 +1119,13 @@ def tenant_quota_update(request, tenant_id, **kwargs):
     quotas = {'quota': kwargs}
     return neutronclient(request).update_quota(tenant_id, quotas)
 
+#mj - backport from queens
+@profiler.trace
+def default_quota_get(request, tenant_id=None):
+    tenant_id = tenant_id or request.user.tenant_id
+    response = neutronclient(request).show_quota_default(tenant_id)
+    return base.QuotaSet(response['quota'])
+
 
 @profiler.trace
 def agent_list(request, **params):
