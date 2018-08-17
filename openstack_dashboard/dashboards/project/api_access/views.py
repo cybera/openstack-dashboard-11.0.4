@@ -124,6 +124,9 @@ def download_ec2_bundle(request):
 def download_rc_file_v2(request):
     template = 'project/api_access/openrc_v2.sh.template'
     context = _get_openrc_credentials(request)
+    #mj - use v2.0 not v3 - (rewrite fix_auth_url_* from openstack_auth)
+    auth_url = utils._augment_url_with_version(context['auth_url'])
+    context['auth_url'] = utils.url_path_replace(auth_url, "/v3", "/v2.0", 1)
     context['os_identity_api_version'] = 2
     context['os_auth_version'] = 2
     return _download_rc_file_for_template(request, context, template)
@@ -141,9 +144,8 @@ def download_rc_file(request):
         project_domain_id = ''
     context['project_domain_id'] = project_domain_id
     # sanity fix for removing v2.0 from the url if present
-    # mj - this breaks our v3 openrc file
-    #context['auth_url'], _ = utils.fix_auth_url_version_prefix(
-    #    context['auth_url'])
+    context['auth_url'], _ = utils.fix_auth_url_version_prefix(
+        context['auth_url'])
     context['os_identity_api_version'] = 3
     context['os_auth_version'] = 3
     return _download_rc_file_for_template(request, context, template)
