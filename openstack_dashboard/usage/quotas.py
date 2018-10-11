@@ -448,13 +448,18 @@ def tenant_limit_usages(request):
             volumes = cinder.volume_list(request)
             snapshots = cinder.volume_snapshot_list(request)
             # gigabytesUsed should be a total of volumes and snapshots
-            vol_size = sum([getattr(volume, 'size', 0) for volume
-                            in volumes])
-            snap_size = sum([getattr(snap, 'size', 0) for snap
-                             in snapshots])
-            limits['gigabytesUsed'] = vol_size + snap_size
-            limits['volumesUsed'] = len(volumes)
-            limits['snapshotsUsed'] = len(snapshots)
+            #mj - display the correct amount of volume usage in the volume creation panel
+            #vol_size = sum([getattr(volume, 'size', 0) for volume
+            #                in volumes])
+            #snap_size = sum([getattr(snap, 'size', 0) for snap
+            #                 in snapshots])
+            #limits['gigabytesUsed'] = vol_size + snap_size
+
+            limits['gigabytesUsed'] = limits.get('totalGigabytesUsed', 0)
+            limits['volumesUsed'] = limits.get('totalVolumesUsed', 0)
+            limits['snapshotsUsed'] = limits.get('totalSnapshotsUsed', 0)
+            #limits['volumesUsed'] = len(volumes)
+            #limits['snapshotsUsed'] = len(snapshots)
         except cinder.cinder_exception.ClientException:
             msg = _("Unable to retrieve volume limit information.")
             exceptions.handle(request, msg)
